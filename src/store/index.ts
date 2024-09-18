@@ -6,6 +6,7 @@ class ControlStore {
     suggestions: CountryInfo[] = [];
     loading = false;
     error = '';
+    debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -17,7 +18,14 @@ class ControlStore {
 
     setInputValue(value: string) {
         this.inputValue = value;
-        this.fetchSuggestions(value);
+
+        if (this.debounceTimeout) {
+            clearTimeout(this.debounceTimeout);
+        }
+
+        this.debounceTimeout = setTimeout(() => {
+            this.fetchSuggestions(value);
+        }, 1000);
     }
 
     async fetchSuggestions(countryName: string) {
